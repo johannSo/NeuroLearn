@@ -1,0 +1,15 @@
+export const XP_PER_SESSION = 10;
+export const STREAK_ICON = '🔥';
+export const XP_ICON = '💎';
+export const AVATAR_NAME = 'Duo the Owl';
+export const STREAK_RESET_VALUE = 0;
+export const SESSION_DURATION_MINUTES = 0.05;
+export const STREAK_COLOR = '#FF9600';
+export const XP_COLOR = '#1CB0F6';
+export const HEART_COLOR = '#FF4B4B';
+export const LESSON_CARD_RADIUS = 16;
+export const BUTTON_RADIUS = 16;
+export const BUTTON_HEIGHT = 56;
+export const BUTTON_FONT_WEIGHT = '700';
+export const BUTTON_FONT_SIZE = 18;
+export const CARD_SHADOW = '0 4px 12px rgba(0,0,0,0.15)'; 
