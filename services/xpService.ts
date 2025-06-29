@@ -1,5 +1,5 @@
+import { STREAK_RESET_VALUE, XP_PER_SESSION } from '@/constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { XP_PER_SESSION, STREAK_RESET_VALUE } from '@/constants';
 
 const XP_KEY = 'xp';
 const STREAK_KEY = 'streak';
@@ -12,6 +12,7 @@ interface Session {
   concentration: number;
   mood: string;
   goalAchieved: boolean | string;
+  duration?: number; // Duration in minutes
 }
 
 export async function getXP() {

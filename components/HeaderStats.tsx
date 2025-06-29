@@ -21,7 +21,10 @@ const HeaderStats = () => {
           ]);
           setXp(currentXp);
           setStreak(currentStreak);
-          setTime(history.length * 25);
+          setTime(history.reduce((acc: number, session: any) => {
+            const sessionDuration = session.duration || 25;
+            return acc + sessionDuration;
+          }, 0));
         } catch (error) {
           console.error("Failed to fetch header stats:", error);
         }

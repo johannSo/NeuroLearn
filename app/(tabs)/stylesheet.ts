@@ -585,7 +585,7 @@ export const styles_learn = StyleSheet.create({
   },
   topicContainer: {
     padding: 12,
-    backgroundColor: Colors.dark.white,
+    // backgroundColor: Colors.dark.white,
     borderRadius: 12,
     marginBottom: 24,
   },

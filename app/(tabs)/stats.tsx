@@ -1,14 +1,11 @@
 import HeaderStats from '@/components/HeaderStats';
 import { Colors } from '@/constants/Colors';
 import { getSessionHistory } from '@/services/xpService';
-import { BlurView } from 'expo-blur';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from 'expo-router';
 import { BookOpen, BrainCircuit, Clock } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { ActivityIndicator, Dimensions, ScrollView, Text, View } from 'react-native';
 import { BarChart, ContributionGraph } from 'react-native-chart-kit';
-import Animated, { FadeIn } from 'react-native-reanimated';
 import { styles_stats } from './stylesheet';
 
 const screenWidth = Dimensions.get('window').width;
@@ -19,6 +16,7 @@ interface Session {
   concentration: number;
   mood: string;
   goalAchieved: boolean | string;
+  duration?: number;
 }
 
 interface StatsData {
@@ -41,25 +39,31 @@ const processSessionData = (sessions: Session[]): StatsData => {
       avgConcentration: 0,
       contributionData: [],
       barChartData: {
-        labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
         datasets: [{ data: [0, 0, 0, 0, 0, 0, 0] }],
       },
     };
   }
 
   const totalSessions = sessions.length;
-  const totalTime = totalSessions * 25; // Each session is 25 minutes
+  const totalTime = sessions.reduce((acc: number, s: Session) => {
+    // Use actual duration if available, otherwise default to 25 minutes
+    const sessionDuration = s.duration || 25;
+    return acc + sessionDuration;
+  }, 0);
   const avgConcentration = sessions.reduce((acc: number, s: Session) => acc + s.concentration, 0) / totalSessions;
 
   const contributionData = sessions.map((s: Session) => ({
     date: s.date,
-    count: Math.round(s.concentration), // Use concentration for heatmap intensity
+    count: 1, // Use 1 for all study days (same color) instead of concentration level
   }));
 
-  const sessionsPerDay = [0, 0, 0, 0, 0, 0, 0]; // Sun -> Sat
+  const sessionsPerDay = [0, 0, 0, 0, 0, 0, 0]; // Mon -> Sun
   sessions.forEach((s: Session) => {
     const dayOfWeek = new Date(s.date).getUTCDay();
-    sessionsPerDay[dayOfWeek]++;
+    // Convert Sunday (0) to 6, Monday (1) to 0, etc.
+    const adjustedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    sessionsPerDay[adjustedDay]++;
   });
 
   return {
@@ -68,12 +72,11 @@ const processSessionData = (sessions: Session[]): StatsData => {
     avgConcentration: avgConcentration.toFixed(1),
     contributionData,
     barChartData: {
-      labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       datasets: [{ data: sessionsPerDay }],
     },
   };
 };
-
 
 export default function StatsScreen() {
   const [stats, setStats] = useState<StatsData | null>(null);
@@ -114,88 +117,90 @@ export default function StatsScreen() {
     backgroundGradientFrom: Colors.dark.card,
     backgroundGradientTo: Colors.dark.card,
     decimalPlaces: 0,
-    color: (opacity = 1) => `rgba(88, 204, 2, ${opacity})`, // Duolingo Green
-    labelColor: (opacity = 1) => `rgba(75, 75, 75, ${opacity})`, // Dark Gray
+    color: (opacity = 1) => `rgba(88, 204, 2, ${opacity})`,
+    labelColor: (opacity = 1) => Colors.dark.text,
+    propsForLabels: {
+      fontSize: 12,
+      fill: Colors.dark.text,
+    },
     style: {
-      borderRadius: 16,
+      borderRadius: 8,
+      paddingLeft: 10,
+      paddingRight: 10,
     },
     propsForDots: {
-      r: '4',
-      strokeWidth: '2',
-      stroke: Colors.dark.darkGreen,
+      r: '3',
+      strokeWidth: '1',
+      stroke: Colors.dark.primary,
     },
   };
 
   return (
-    <LinearGradient colors={[Colors.dark.primary, Colors.dark.secondary]} style={styles_stats.gradientBg}>
-      <ScrollView style={{flex:1}} contentContainerStyle={styles_stats.contentContainer} showsVerticalScrollIndicator={false}>
+    <View style={styles_stats.container}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles_stats.contentContainer} showsVerticalScrollIndicator={false}>
         <HeaderStats />
-        <Animated.View entering={FadeIn.duration(600)}>
-          <Text style={styles_stats.headerTitle}>Your Progress</Text>
-        </Animated.View>
+        <Text style={styles_stats.headerTitle}>Your Progress</Text>
+        
         <View style={styles_stats.statsGrid}>
-          <Animated.View entering={FadeIn.duration(700)} style={styles_stats.cardGlass}>
-            <BlurView intensity={40} tint="dark" style={styles_stats.cardGlass}>
-              <View style={[styles_stats.statCard, {backgroundColor: Colors.dark.card}]}>
-                <BookOpen size={24} color={Colors.dark.primary} />
-                <Text style={[styles_stats.statValue, {color: Colors.dark.text}]}>{stats.totalSessions}</Text>
-                <Text style={styles_stats.statLabel}>Total Sessions</Text>
-              </View>
-            </BlurView>
-          </Animated.View>
-          <Animated.View entering={FadeIn.duration(800)} style={styles_stats.cardGlass}>
-            <BlurView intensity={40} tint="dark" style={styles_stats.cardGlass}>
-              <View style={[styles_stats.statCard, {backgroundColor: Colors.dark.card}]}>
-                <Clock size={24} color={Colors.dark.primary} />
-                <Text style={[styles_stats.statValue, {color: Colors.dark.text}]}>{Math.floor(stats.totalTime / 60)}h {stats.totalTime % 60}m</Text>
-                <Text style={styles_stats.statLabel}>Total Time</Text>
-              </View>
-            </BlurView>
-          </Animated.View>
-          <Animated.View entering={FadeIn.duration(900)} style={styles_stats.cardGlass}>
-            <BlurView intensity={40} tint="dark" style={styles_stats.cardGlass}>
-              <View style={[styles_stats.statCard, {backgroundColor: Colors.dark.card}]}>
-                <BrainCircuit size={24} color={Colors.dark.primary} />
-                <Text style={[styles_stats.statValue, {color: Colors.dark.text}]}>{stats.avgConcentration} / 5</Text>
-                <Text style={styles_stats.statLabel}>Avg. Focus</Text>
-              </View>
-            </BlurView>
-          </Animated.View>
+          <View style={styles_stats.statCard}>
+            <BookOpen size={20} color={Colors.dark.primary} />
+            <Text style={styles_stats.statValue}>{stats.totalSessions}</Text>
+            <Text style={styles_stats.statLabel}>Total Sessions</Text>
+          </View>
+          
+          <View style={styles_stats.statCard}>
+            <Clock size={20} color={Colors.dark.primary} />
+            <Text style={styles_stats.statValue}>{Math.floor(stats.totalTime / 60)}h {stats.totalTime % 60}m</Text>
+            <Text style={styles_stats.statLabel}>Total Time</Text>
+          </View>
+          
+          <View style={styles_stats.statCard}>
+            <BrainCircuit size={20} color={Colors.dark.primary} />
+            <Text style={styles_stats.statValue}>{stats.avgConcentration}/5</Text>
+            <Text style={styles_stats.statLabel}>Avg. Focus</Text>
+          </View>
         </View>
-        <Animated.View entering={FadeIn.duration(1000)} style={styles_stats.cardGlass}>
-          <BlurView intensity={40} tint="dark" style={styles_stats.cardGlass}>
-            <View style={styles_stats.chartCard}>
-              <Text style={styles_stats.chartTitle}>Study Consistency</Text>
-              <ContributionGraph
+
+        <View style={styles_stats.chartCard}>
+          <Text style={styles_stats.chartTitle}>Study Consistency</Text>
+          <ContributionGraph
                 values={stats.contributionData}
                 endDate={new Date()}
                 numDays={105}
                 width={screenWidth - 40}
                 height={220}
-                chartConfig={chartConfig}
+                chartConfig={{
+                  ...chartConfig,
+                  color: (opacity = 1) => `rgba(88, 204, 2, ${opacity})`,
+                  backgroundGradientFrom: Colors.dark.card,
+                  backgroundGradientTo: Colors.dark.card,
+                }}
                 tooltipDataAttrs={() => ({})}
-              />
-            </View>
-          </BlurView>
-        </Animated.View>
-        <Animated.View entering={FadeIn.duration(1100)} style={styles_stats.cardGlass}>
-          <BlurView intensity={40} tint="dark" style={styles_stats.cardGlass}>
-            <View style={styles_stats.chartCard}>
-              <Text style={styles_stats.chartTitle}>Daily Activity</Text>
-              <BarChart
-                data={stats.barChartData}
-                width={screenWidth - 40}
-                height={220}
-                yAxisLabel=""
-                yAxisSuffix=""
-                chartConfig={chartConfig}
-                verticalLabelRotation={0}
-                fromZero={true}
-              />
-            </View>
-          </BlurView>
-        </Animated.View>
+                gutterSize={2}
+                squareSize={20}
+          />
+        </View>
+
+        <View style={styles_stats.chartCard}>
+          <Text style={styles_stats.chartTitle}>Daily Activity</Text>
+          <BarChart
+            data={stats.barChartData}
+            width={screenWidth - 40}
+            height={180}
+            yAxisLabel=""
+            yAxisSuffix=""
+            chartConfig={chartConfig}
+            verticalLabelRotation={0}
+            withVerticalLabels={true}
+            withHorizontalLabels={true}
+            style={{
+              paddingLeft: 0,
+              paddingRight: 0,
+              alignSelf: 'center',
+            }}
+          />
+        </View>
       </ScrollView>
-    </LinearGradient>
+    </View>
   );
 }

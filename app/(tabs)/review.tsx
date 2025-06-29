@@ -4,7 +4,7 @@ import { BlurView } from 'expo-blur';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Frown, Meh, Smile, Star } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { styles_review } from './stylesheet';
 
@@ -59,6 +59,7 @@ export default function ReviewScreen() {
       concentration,
       mood,
       goalAchieved,
+      duration: 25,
     });
 
     router.replace('/(tabs)/pause');
@@ -75,13 +76,9 @@ export default function ReviewScreen() {
               <View style={[styles_review.card, {backgroundColor: Colors.dark.card}]}>
                 <Text style={[styles_review.title, {color: Colors.dark.primary}]}>Session Review</Text>
                 <Text style={styles_review.question}>What did you work on?</Text>
-                <TextInput
-                  style={styles_review.input}
-                  value={topic}
-                  onChangeText={setTopic}
-                  placeholder="e.g., Physics, Spanish, Piano"
-                  editable={!params.topic}
-                />
+                <Text style={[styles_review.input, {color: Colors.dark.primary}]}>
+                  {topic || "Error: couldn't load var topic"}
+                </Text>
                 <Text style={styles_review.question}>How was your concentration?</Text>
                 <StarRating rating={concentration} setRating={setConcentration} />
                 <Text style={styles_review.question}>How are you feeling?</Text>

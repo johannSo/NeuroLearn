@@ -1,19 +1,11 @@
 import HeaderStats from '@/components/HeaderStats';
 import { Colors } from '@/constants/Colors';
-import { getSessionHistory } from '@/services/xpService';
+import { getXP } from '@/services/xpService';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Animated, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './stylesheet';
-
-interface Session {
-  date: string;
-  topic: string;
-  concentration: number;
-  mood: string;
-  goalAchieved: boolean | string;
-}
 
 const learningTips = [
   "Take short breaks every 25-30 minutes to stay fresh.",
@@ -24,13 +16,12 @@ const learningTips = [
 ];
 
 const getDailyGoalProgress = async () => {
-  const sessionsToday = (await getSessionHistory()).filter((s: Session) => s.date === new Date().toISOString().split('T')[0]);
-  const xpToday = sessionsToday.length * 10;
+  const xp = await getXP();
   const goal = 100;
   return {
-    xp: xpToday,
+    xp: xp,
     goal: goal,
-    progress: Math.min((xpToday / goal) * 100, 100)
+    progress: Math.min((xp / goal) * 100, 100)
   };
 };
 
