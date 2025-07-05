@@ -1,11 +1,11 @@
 import HeaderStats from '@/components/HeaderStats';
 import { Colors } from '@/constants/Colors';
-import { getXP } from '@/services/xpService';
+import { getTodayXP } from '@/services/xpService';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect } from 'expo-router';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Animated, Text, TouchableOpacity, View } from 'react-native';
-import { styles } from './stylesheet';
+import { styles } from '../stylesheet';
 
 const learningTips = [
   "Take short breaks every 25-30 minutes to stay fresh.",
@@ -16,13 +16,18 @@ const learningTips = [
 ];
 
 const getDailyGoalProgress = async () => {
-  const xp = await getXP();
-  const goal = 100;
-  return {
-    xp: xp,
-    goal: goal,
-    progress: Math.min((xp / goal) * 100, 100)
-  };
+  try {
+    const xp = await getTodayXP();
+    const goal = 100;
+    return {
+      xp: xp,
+      goal: goal,
+      progress: Math.min((xp / goal) * 100, 100)
+    };
+  } catch (error) {
+    console.error("Failed to get daily goal progress:", error);
+    return { xp: 0, goal: 100, progress: 0 };
+  }
 };
 
 const AnimatedTabIcon = ({ Component, color, focused, ...rest }: { Component: React.ElementType, color: string, focused: boolean, [key: string]: any }) => {
@@ -53,11 +58,27 @@ const AnimatedTabIcon = ({ Component, color, focused, ...rest }: { Component: Re
 
 export default function DashboardScreen() {
   const [dailyProgress, setDailyProgress] = React.useState({ xp: 0, goal: 100, progress: 0 });
+  const [isLoading, setIsLoading] = useState(true);
   const tipOfTheDay = React.useMemo(() => learningTips[new Date().getDate() % learningTips.length], []);
+
+  const updateProgress = async () => {
+    try {
+      setIsLoading(true);
+      // Add a small delay to ensure data is properly saved before fetching
+      await new Promise(resolve => setTimeout(resolve, 100));
+      const progress = await getDailyGoalProgress();
+      console.log('Updated daily progress:', progress); // Debug log
+      setDailyProgress(progress);
+    } catch (error) {
+      console.error("Failed to update progress:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useFocusEffect(
     React.useCallback(() => {
-      getDailyGoalProgress().then(setDailyProgress);
+      updateProgress();
     }, [])
   );
 
@@ -88,7 +109,9 @@ export default function DashboardScreen() {
         <View style={styles.progressBarBg}>
           <View style={[styles.progressBarFill, { width: `${dailyProgress.progress}%` }]} />
         </View>
-        <Text style={styles.progressText}>{dailyProgress.xp} / {dailyProgress.goal} XP</Text>
+        <Text style={styles.progressText}>
+          {isLoading ? '0 / 100 XP' : `${dailyProgress.xp} / ${dailyProgress.goal} XP`}
+        </Text>
       </View>
     </View>
   );

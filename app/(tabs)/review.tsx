@@ -1,12 +1,10 @@
 import { Colors } from '@/constants/Colors';
 import { addSessionHistory, addXP, recordSessionForStreak } from '@/services/xpService';
-import { BlurView } from 'expo-blur';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Frown, Meh, Smile, Star } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
-import { styles_review } from './stylesheet';
+import { styles_review } from '../stylesheet';
 
 const StarRating = ({ rating, setRating }: { rating: number; setRating: (rating: number) => void }) => (
   <View style={styles_review.ratingContainer}>
@@ -50,19 +48,29 @@ export default function ReviewScreen() {
   const handleComplete = async () => {
     if (!isComplete) return;
     
-    await addXP();
-    await recordSessionForStreak();
+    try {
+      // Save all data first
+      await addXP();
+      await recordSessionForStreak();
 
-    await addSessionHistory({
-      date: new Date().toISOString().split('T')[0],
-      topic,
-      concentration,
-      mood,
-      goalAchieved,
-      duration: 25,
-    });
+      const sessionData = {
+        date: new Date().toISOString().split('T')[0],
+        topic,
+        concentration,
+        mood,
+        goalAchieved,
+        duration: 25,
+      };
+      
+      console.log('Saving session data:', sessionData); // Debug log
+      await addSessionHistory(sessionData);
 
-    router.replace('/(tabs)/pause');
+      // Navigate after all data is saved
+      router.replace('/(tabs)/pause');
+    } catch (error) {
+      console.error("Failed to complete session:", error);
+      // You might want to show an error message to the user here
+    }
   };
 
   return (
@@ -71,8 +79,8 @@ export default function ReviewScreen() {
         style={styles_review.container}
       >
         <ScrollView contentContainerStyle={styles_review.scrollContainer} showsVerticalScrollIndicator={false}>
-          <Animated.View entering={FadeIn.duration(600)} style={styles_review.cardGlass}>
-            <BlurView intensity={40} tint="dark" style={styles_review.cardGlass}>
+           {/* <View style={styles_review.cardGlass}> */}
+            {/* <BlurView intensity={40} tint="dark" style={styles_review.cardGlass}> */}
               <View style={[styles_review.card, {backgroundColor: Colors.dark.card}]}>
                 <Text style={[styles_review.title, {color: Colors.dark.primary}]}>Session Review</Text>
                 <Text style={styles_review.question}>What did you work on?</Text>
@@ -112,8 +120,8 @@ export default function ReviewScreen() {
                   <Text style={styles_review.completeButtonText}>Complete Session</Text>
                 </TouchableOpacity>
               </View>
-            </BlurView>
-          </Animated.View>
+            {/* </BlurView> */}
+          {/* </View> */}
         </ScrollView>
       </KeyboardAvoidingView>
     </View>

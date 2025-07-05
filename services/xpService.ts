@@ -20,6 +20,20 @@ export async function getXP() {
   return xp ? parseInt(xp, 10) : 0;
 }
 
+export async function getTodayXP() {
+  const history = await getSessionHistory();
+  const today = new Date().toISOString().split('T')[0];
+  const todaySessions = history.filter((session: any) => session.date === today);
+  const todayXP = todaySessions.length * XP_PER_SESSION;
+  
+  console.log('getTodayXP - Today:', today);
+  console.log('getTodayXP - All sessions:', history);
+  console.log('getTodayXP - Today sessions:', todaySessions);
+  console.log('getTodayXP - Today XP:', todayXP);
+  
+  return todayXP;
+}
+
 export async function addXP(amount = XP_PER_SESSION) {
   const current = await getXP();
   const newXP = current + amount;

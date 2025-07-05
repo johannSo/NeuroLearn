@@ -134,7 +134,7 @@ export const styles_ai = StyleSheet.create({
   },
   suggestedQuestionButton: {
     padding: 8,
-    backgroundColor: Colors.dark.test,
+    backgroundColor: '#222',
     borderRadius: 16,
     marginBottom: 6,
     marginRight: 8,
@@ -182,6 +182,7 @@ export const styles_ai = StyleSheet.create({
 export const styles_stats = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 20,
     backgroundColor: Colors.dark.background,
   },
   center: {
@@ -281,6 +282,7 @@ export const styles_settings = StyleSheet.create({
 export const styles_pause = StyleSheet.create({
   gradientBg: {
     flex: 1,
+    backgroundColor: '#000',
   },
   innerContainer: {
     flex: 1,
@@ -347,9 +349,13 @@ export const styles_pause = StyleSheet.create({
 }); 
 
 export const styles_review = StyleSheet.create({
+  gradientBg: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
   container: {
     flex: 1,
-    backgroundColor: Colors.dark.background,
+    backgroundColor: 'transparent',
   },
   scrollContainer: {
     flexGrow: 1,
@@ -359,24 +365,25 @@ export const styles_review = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '800',
-    color: Colors.dark.primary,
+    color: '#4F8EF7',
     textAlign: 'center',
     marginBottom: 24,
   },
   question: {
     fontSize: 18,
     fontWeight: '600',
-    color: Colors.dark.muted,
+    color: '#888',
     marginBottom: 12,
     marginTop: 16,
   },
   input: {
-    backgroundColor: Colors.dark.card,
+    backgroundColor: '#181818',
     borderWidth: 2,
-    borderColor: Colors.dark.border,
+    borderColor: '#222',
     borderRadius: 12,
     padding: 12,
     fontSize: 16,
+    color: '#FFF',
   },
   ratingContainer: {
     flexDirection: 'row',
@@ -384,9 +391,9 @@ export const styles_review = StyleSheet.create({
     marginVertical: 12,
   },
   choiceButton: {
-    backgroundColor: Colors.dark.card,
+    backgroundColor: '#181818',
     borderWidth: 2,
-    borderColor: Colors.dark.border,
+    borderColor: '#222',
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -394,16 +401,16 @@ export const styles_review = StyleSheet.create({
     alignItems: 'center',
   },
   choiceSelected: {
-    borderColor: Colors.dark.primary,
-    backgroundColor: Colors.dark.lightGray,
+    borderColor: '#fff',
+    backgroundColor: '#222',
   },
   choiceText: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.dark.text,
+    color: '#FFF',
   },
   completeButton: {
-    backgroundColor: Colors.dark.muted,
+    backgroundColor: '#888',
     borderRadius: 16,
     paddingVertical: 16,
     alignItems: 'center',
@@ -411,15 +418,12 @@ export const styles_review = StyleSheet.create({
     width: '100%',
   },
   completeButtonText: {
-    color: Colors.dark.text,
+    color: '#FFF',
     fontSize: 18,
     fontWeight: '700',
   },
   disabledButton: {
-    backgroundColor: Colors.dark.lightGray,
-  },
-  gradientBg: {
-    flex: 1,
+    backgroundColor: '#222',
   },
   cardGlass: {
     borderRadius: 20,
@@ -428,12 +432,7 @@ export const styles_review = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: 18,
     overflow: 'hidden',
-  },
-  completeButtonGradient: {
-    borderRadius: 16,
-    paddingVertical: 16,
-    alignItems: 'center',
-    width: '100%',
+    backgroundColor: 'rgba(24,24,24,0.85)',
   },
   card: {
     borderRadius: 20,
@@ -442,6 +441,7 @@ export const styles_review = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: 18,
     overflow: 'hidden',
+    backgroundColor: 'transparent',
   },
 }); 
 
@@ -531,6 +531,7 @@ export const styles = StyleSheet.create({
 export const styles_learn = StyleSheet.create({
   gradientBg: {
     flex: 1,
+    backgroundColor: '#000',
   },
   innerContainer: {
     flex: 1,
@@ -566,11 +567,11 @@ export const styles_learn = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.dark.white,
+    backgroundColor: '#181818',
     borderRadius: 12,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: Colors.dark.border,
+    borderColor: '#222',
     marginBottom: 20,
     width: '100%',
   },
@@ -578,7 +579,7 @@ export const styles_learn = StyleSheet.create({
     marginRight: 8,
   },
   input: {
-    color: Colors.dark.primary,
+    color: '#FFF',
     flex: 1,
     height: 50,
     fontSize: 16,
@@ -626,20 +627,20 @@ export const styles_learn = StyleSheet.create({
     marginBottom: 24,
   },
   startButton: {
-    backgroundColor: Colors.dark.lightGray,
+    backgroundColor: '#888',
     borderRadius: 16,
     paddingVertical: 16,
     paddingHorizontal: 32,
     width: '100%',
     alignItems: 'center',
-    shadowColor: Colors.dark.secondary,
+    shadowColor: '#222',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
   },
   disabledButton: {
-    backgroundColor: Colors.dark.secondary,
+    backgroundColor: '#222',
     shadowColor: 'transparent',
     elevation: 0,
   },
@@ -663,7 +664,7 @@ export const styles_learn = StyleSheet.create({
     alignItems: 'center',
   },
   resetButton: {
-    backgroundColor: Colors.dark.darkGray,
+    backgroundColor: '#222',
   },
   controlButtonText: {
     color: '#ffffff',

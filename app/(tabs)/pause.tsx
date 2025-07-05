@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
-import { styles_pause } from './stylesheet';
+import { styles_pause } from '../stylesheet';
 
 
 export default function PauseScreen() {

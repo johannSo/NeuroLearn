@@ -32,6 +32,9 @@ module.exports = {
         eas: {
           projectId: "341d2e79-744c-4fc5-8694-0e76072de8ab"
         }
-      }
+      },
+      plugins: [
+        "expo-router"
+      ]
     }
   };

@@ -36,23 +36,19 @@ export default function TabLayout() {
         tabBarStyle: [
           {
             position: 'absolute',
-            left: 16,
-            right: 16,
-            bottom: 16,
-            borderRadius: 20,
+            bottom: 8,
+            borderRadius: 14,
             backgroundColor: Colors.dark.card,
-            borderWidth: 2,
-            borderColor: Colors.dark.darkGray,
-            height: 60,
-            elevation: 16,
-            shadowColor: Colors.dark.black,
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.15,
-            shadowRadius: 16,
+            borderWidth: 1,
+            borderColor: Colors.dark.border,
+            height: 50,
+            elevation: 6,
             borderTopWidth: 0,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-around',
+            paddingTop: 0,
+            paddingBottom: 25,
           },
         ],
       }}>
@@ -116,18 +112,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="review"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="pause"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',
@@ -139,6 +123,18 @@ export default function TabLayout() {
               focused={focused}
             />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="pause"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="review"
+        options={{
+          href: null,
         }}
       />
     </Tabs>

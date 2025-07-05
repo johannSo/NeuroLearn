@@ -6,7 +6,7 @@ import { BookOpen, BrainCircuit, Clock } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { ActivityIndicator, Dimensions, ScrollView, Text, View } from 'react-native';
 import { BarChart, ContributionGraph } from 'react-native-chart-kit';
-import { styles_stats } from './stylesheet';
+import { styles_stats } from '../stylesheet';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -167,7 +167,7 @@ export default function StatsScreen() {
                 values={stats.contributionData}
                 endDate={new Date()}
                 numDays={105}
-                width={screenWidth - 40}
+                width={screenWidth - 20}
                 height={220}
                 chartConfig={{
                   ...chartConfig,

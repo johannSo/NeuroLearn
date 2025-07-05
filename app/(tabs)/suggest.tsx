@@ -1,4 +1,5 @@
 import { getSessionHistory } from '@/services/xpService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Bot, User } from 'lucide-react-native';
@@ -13,7 +14,7 @@ import {
 } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { Colors } from '../../constants/Colors';
-import { styles_ai } from './stylesheet';
+import { styles_ai } from '../stylesheet';
 
 interface Message {
   id: string;
@@ -51,6 +52,8 @@ export default function SuggestScreen() {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
+  const [apiKey, setApiKey] = useState<string | null>(null);
+  const [showApiKeyError, setShowApiKeyError] = useState(false);
 
   const suggestedQuestions = [
     "How can I improve my focus while studying?",
@@ -69,7 +72,7 @@ export default function SuggestScreen() {
   };
 
   useEffect(() => {
-    const fetchHistory = async () => {
+    const fetchHistoryAndKey = async () => {
       const history = await getSessionHistory();
       setSessionHistory(history);
       setMessages([
@@ -80,13 +83,20 @@ export default function SuggestScreen() {
           timestamp: new Date()
         }
       ]);
+      const key = await AsyncStorage.getItem('GEMINI_API_KEY');
+      setApiKey(key);
     };
-    fetchHistory();
+    fetchHistoryAndKey();
   }, []);
 
   const sendMessage = async (customText?: string) => {
     const textToSend = customText || inputText.trim();
     if (!textToSend || isLoading) return;
+    if (!apiKey) {
+      setShowApiKeyError(true);
+      return;
+    }
+    setShowApiKeyError(false);
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -102,13 +112,22 @@ export default function SuggestScreen() {
     const sessionContext = formatSessionForPrompt(sessionHistory);
 
     try {
-      const response = await fetch('http://192.168.2.65:3000/gemini', {
+      const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey,
         },
         body: JSON.stringify({
-          prompt: `${sessionContext}\n\nYou are an AI learning assistant for the app called "NeuroLearn". The user asks: "${textToSend}". Please provide helpful, encouraging, and practical advice based on their history. Keep your response SHORT and CONCISE - aim for 2-3 short paragraphs maximum. Be encouraging but direct.`
+          contents: [
+            {
+              parts: [
+                {
+                  text: `${sessionContext}\n\nYou are an AI learning assistant for the app called \"NeuroLearn\", it is an inteligent Pomodoro Timer with you the AI built into it. The user asks: \"${textToSend}\". Please provide helpful, encouraging, and practical advice based on their history. Keep your response SHORT and CONCISE - aim for 2-3 short paragraphs maximum. Be encouraging but direct.`
+                }
+              ]
+            }
+          ]
         }),
       });
 
@@ -117,10 +136,13 @@ export default function SuggestScreen() {
       }
 
       const data = await response.json();
-      
+      let aiText = 'Sorry, I could not process your request.';
+      if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0].text) {
+        aiText = data.candidates[0].content.parts[0].text;
+      }
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: data.response || 'Sorry, I couldn\'t process your request. Please try again.',
+        text: aiText,
         isUser: false,
         timestamp: new Date()
       };
@@ -183,6 +205,11 @@ export default function SuggestScreen() {
         <View style={styles_ai.header}>
           <Text style={[styles_ai.title, {color: Colors.dark.primary}]}>Learning Assistant</Text>
           <Text style={styles_ai.subtitle}>Get personalized learning suggestions</Text>
+          {showApiKeyError && (
+            <Text style={{ color: 'red', marginTop: 10, fontWeight: 'bold' }}>
+              Please enter your Gemini API key in Settings to use AI features.
+            </Text>
+          )}
         </View>
         <ScrollView 
           ref={scrollViewRef}

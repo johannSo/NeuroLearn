@@ -1,12 +1,10 @@
 import { SESSION_DURATION_MINUTES } from '@/constants';
-import { Colors } from '@/constants/Colors';
 import { BlurView } from 'expo-blur';
 import { router, useFocusEffect } from 'expo-router';
 import { BookOpen } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Keyboard, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
-import { styles_learn } from './stylesheet';
+import { styles_learn } from '../stylesheet';
 
 const TOTAL_SECONDS = SESSION_DURATION_MINUTES * 60;
 
@@ -71,16 +69,16 @@ export default function LearnScreen() {
     <View style={styles_learn.gradientBg}>
       <View style={styles_learn.innerContainer}>
         {!hasStarted ? (
-          <Animated.View entering={FadeIn.duration(600)} style={styles_learn.cardGlass}>
+          <View style={styles_learn.cardGlass}>
             <BlurView intensity={40} tint="dark" style={styles_learn.cardGlass}>
-              <View style={[styles_learn.card, {backgroundColor: Colors.dark.card}]}>
-                <Text style={[styles_learn.title, {color: Colors.dark.primary}]}>Ready to Learn?</Text>
+              <View style={[styles_learn.card, {backgroundColor: '#181818'}]}>
+                <Text style={[styles_learn.title, {color: '#fff'}]}>Ready to Learn?</Text>
                 <View style={styles_learn.inputContainer}>
-                  <BookOpen color={Colors.dark.muted} size={20} style={styles_learn.inputIcon} />
+                  <BookOpen color={'#888'} size={20} style={styles_learn.inputIcon} />
                   <TextInput
                     style={styles_learn.input}
                     placeholder="What are you focusing on?"
-                    placeholderTextColor={Colors.dark.primary}
+                    placeholderTextColor={'#fff'}
                     value={topic}
                     onChangeText={setTopic}
                   />
@@ -90,10 +88,9 @@ export default function LearnScreen() {
                 </TouchableOpacity>
               </View>
             </BlurView>
-          </Animated.View>
+          </View>
         ) : (
-          <Animated.View entering={FadeIn.duration(600)} style={styles_learn.cardGlass}>
-            <BlurView intensity={40} tint="dark" style={styles_learn.cardGlass}>
+          <View style={styles_learn.cardGlass}>
               <View style={styles_learn.topicContainer}>
                 <Text style={styles_learn.topicText}>{topic}</Text>
               </View>
@@ -118,8 +115,7 @@ export default function LearnScreen() {
                   <Text style={styles_learn.controlButtonText}>Reset/Quit</Text>
                 </TouchableOpacity>
               </View>
-            </BlurView>
-          </Animated.View>
+          </View>
         )}
       </View>
     </View>
