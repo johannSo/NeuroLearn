@@ -1,0 +1,63 @@
+{
+  "name": "neurolearn-docs",
+  "version": "1.0.0",
+  "description": "Documentation for NeuroLearn - Your AI-powered learning companion",
+  "private": true,
+  "scripts": {
+    "docusaurus": "docusaurus",
+    "start": "docusaurus start",
+    "build": "docusaurus build",
+    "swizzle": "docusaurus swizzle",
+    "deploy": "docusaurus deploy",
+    "clear": "docusaurus clear",
+    "serve": "docusaurus serve",
+    "write-translations": "docusaurus write-translations",
+    "write-heading-ids": "docusaurus write-heading-ids",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@docusaurus/core": "3.8.1",
+    "@docusaurus/preset-classic": "3.8.1",
+    "@mdx-js/react": "^3.0.0",
+    "clsx": "^2.0.0",
+    "prism-react-renderer": "^2.3.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@docusaurus/module-type-aliases": "3.8.1",
+    "@docusaurus/types": "3.8.1",
+    "typescript": "^5.0.4"
+  },
+  "browserslist": {
+    "production": [
+      ">0.5%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/neurolearn/neurolearn-mobile.git",
+    "directory": "neurolearncode"
+  },
+  "keywords": [
+    "neurolearn",
+    "learning",
+    "education",
+    "productivity",
+    "mobile-app",
+    "documentation"
+  ],
+  "author": "NeuroLearn Team",
+  "license": "MIT",
+  "homepage": "https://neurolearn.app"
+}

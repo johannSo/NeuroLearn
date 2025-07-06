@@ -8,7 +8,7 @@ module.exports = {
       splash: {
         image: "./assets/images/splash-icon.png",
         resizeMode: "contain",
-        backgroundColor: "#ffffff"
+        backgroundColor: "#000000"
       },
       updates: {
         fallbackToCacheTimeout: 0
@@ -19,9 +19,14 @@ module.exports = {
       android: {
         adaptiveIcon: {
           foregroundImage: "./assets/icons/adaptive-icon.png",
+          monochromeImage: "./assets/icons/adaptive-icon.png",
           backgroundColor: "#ffffff"
         },
-        package: "com.satoshi.neurolearn"
+        package: "com.satoshi.neurolearn",
+        edgeToEdgeEnabled: true
+      },
+      ios: {
+        bundleIdentifier: "com.satoshi.neurolearn"
       },
       web: {
         favicon: "./assets/icons/adaptive-icon.png"
