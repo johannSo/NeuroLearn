@@ -5,7 +5,7 @@ import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Tabs } from 'expo-router';
-import { Settings as SettingsIcon } from 'lucide-react-native';
+import { Settings as SettingsIcon, ClipboardList as TodoIcon, User as UserIcon } from 'lucide-react-native';
 import React from 'react';
 import { View } from 'react-native';
 
@@ -112,6 +112,20 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color, focused }) => (
+            <AnimatedTabIcon
+              key={focused ? 'focused' : 'unfocused'}
+              Component={UserIcon}
+              color={color}
+              focused={focused}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',
@@ -119,6 +133,20 @@ export default function TabLayout() {
             <AnimatedTabIcon
               key={focused ? 'focused' : 'unfocused'}
               Component={SettingsIcon}
+              color={color}
+              focused={focused}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="todo"
+        options={{
+          title: 'Todo',
+          tabBarIcon: ({ color, focused }) => (
+            <AnimatedTabIcon
+              key={focused ? 'focused' : 'unfocused'}
+              Component={TodoIcon}
               color={color}
               focused={focused}
             />
