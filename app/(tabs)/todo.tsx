@@ -1,5 +1,6 @@
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from 'expo-router';
 import { BookOpen } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -27,28 +28,36 @@ export default function TodoScreen() {
   const [input, setInput] = useState('');
   const [archive, setArchive] = useState<Todo[]>([]);
 
-  // Load todos and archive from AsyncStorage on mount
+  // Load todos and archive from AsyncStorage
+  const loadTodos = async () => {
+    try {
+      const stored = await AsyncStorage.getItem('todos');
+      if (stored) setTodos(JSON.parse(stored));
+      else setTodos([]);
+      const archived = await AsyncStorage.getItem('todos_archive');
+      if (archived) setArchive(JSON.parse(archived));
+      else setArchive([]);
+    } catch (e) {}
+  };
+
   useEffect(() => {
-    const loadTodos = async () => {
-      try {
-        const stored = await AsyncStorage.getItem('todos');
-        if (stored) setTodos(JSON.parse(stored));
-        const archived = await AsyncStorage.getItem('todos_archive');
-        if (archived) setArchive(JSON.parse(archived));
-      } catch (e) {}
-    };
     loadTodos();
   }, []);
 
-  // Save todos to AsyncStorage whenever they change
-  useEffect(() => {
-    AsyncStorage.setItem('todos', JSON.stringify(todos));
-  }, [todos]);
+  // Reload todos and archive every time the tab is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      loadTodos();
+    }, [])
+  );
 
-  // Save archive to AsyncStorage whenever it changes
-  useEffect(() => {
-    AsyncStorage.setItem('todos_archive', JSON.stringify(archive));
-  }, [archive]);
+  // Save both todos and archive to AsyncStorage
+  const saveAll = async (newTodos: Todo[], newArchive: Todo[]) => {
+    setTodos(newTodos);
+    setArchive(newArchive);
+    await AsyncStorage.setItem('todos', JSON.stringify(newTodos));
+    await AsyncStorage.setItem('todos_archive', JSON.stringify(newArchive));
+  };
 
   const addTodo = () => {
     if (!input.trim()) return;
@@ -64,16 +73,16 @@ export default function TodoScreen() {
     if (!isArchive) {
       const todo = todos.find(t => t.id === id);
       if (todo) {
-        // Move to archive (always set completed: true)
-        setTodos(prev => prev.filter(t => t.id !== id));
-        setArchive(prev => [ { ...todo, completed: true }, ...prev ]);
+        const newTodos = todos.filter(t => t.id !== id);
+        const newArchive = [{ ...todo, completed: true }, ...archive];
+        saveAll(newTodos, newArchive);
       }
     } else {
       const todo = archive.find(t => t.id === id);
       if (todo) {
-        // Move back to todos (always set completed: false)
-        setArchive(prev => prev.filter(t => t.id !== id));
-        setTodos(prev => [ { ...todo, completed: false }, ...prev ]);
+        const newArchive = archive.filter(t => t.id !== id);
+        const newTodos = [{ ...todo, completed: false }, ...todos];
+        saveAll(newTodos, newArchive);
       }
     }
   };
@@ -81,9 +90,13 @@ export default function TodoScreen() {
   // Delete from archive or todos
   const deleteTodo = (id: string, isArchive = false) => {
     if (isArchive) {
-      setArchive(prev => prev.filter(todo => todo.id !== id));
+      const newArchive = archive.filter(todo => todo.id !== id);
+      setArchive(newArchive);
+      AsyncStorage.setItem('todos_archive', JSON.stringify(newArchive));
     } else {
-      setTodos(prev => prev.filter(todo => todo.id !== id));
+      const newTodos = todos.filter(todo => todo.id !== id);
+      setTodos(newTodos);
+      AsyncStorage.setItem('todos', JSON.stringify(newTodos));
     }
   };
 

@@ -1,6 +1,7 @@
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { getArchivedTodos, setArchivedTodos } from './todo';
@@ -35,6 +36,14 @@ export default function ProfileScreen() {
     loadProfileData();
     loadArchive();
   }, []);
+
+  // Reload archive (and profile) every time the tab is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      loadProfileData();
+      loadArchive();
+    }, [])
+  );
 
   const loadProfileData = async () => {
     try {
