@@ -12,23 +12,43 @@ interface Todo {
   completed: boolean;
 }
 
+// Helper functions for archive management
+export async function getArchivedTodos() {
+  const stored = await AsyncStorage.getItem('todos_archive');
+  return stored ? JSON.parse(stored) : [];
+}
+
+export async function setArchivedTodos(archive: Todo[]) {
+  await AsyncStorage.setItem('todos_archive', JSON.stringify(archive));
+}
+
 export default function TodoScreen() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [input, setInput] = useState('');
+  const [archive, setArchive] = useState<Todo[]>([]);
 
+  // Load todos and archive from AsyncStorage on mount
   useEffect(() => {
     const loadTodos = async () => {
       try {
         const stored = await AsyncStorage.getItem('todos');
         if (stored) setTodos(JSON.parse(stored));
+        const archived = await AsyncStorage.getItem('todos_archive');
+        if (archived) setArchive(JSON.parse(archived));
       } catch (e) {}
     };
     loadTodos();
   }, []);
 
+  // Save todos to AsyncStorage whenever they change
   useEffect(() => {
     AsyncStorage.setItem('todos', JSON.stringify(todos));
   }, [todos]);
+
+  // Save archive to AsyncStorage whenever it changes
+  useEffect(() => {
+    AsyncStorage.setItem('todos_archive', JSON.stringify(archive));
+  }, [archive]);
 
   const addTodo = () => {
     if (!input.trim()) return;
@@ -39,12 +59,32 @@ export default function TodoScreen() {
     setInput('');
   };
 
-  const toggleTodo = (id: string) => {
-    setTodos(prev => prev.map(todo => todo.id === id ? { ...todo, completed: !todo.completed } : todo));
+  // Move to archive when checked, move back when unchecked
+  const toggleTodo = (id: string, isArchive = false) => {
+    if (!isArchive) {
+      const todo = todos.find(t => t.id === id);
+      if (todo) {
+        // Move to archive (always set completed: true)
+        setTodos(prev => prev.filter(t => t.id !== id));
+        setArchive(prev => [ { ...todo, completed: true }, ...prev ]);
+      }
+    } else {
+      const todo = archive.find(t => t.id === id);
+      if (todo) {
+        // Move back to todos (always set completed: false)
+        setArchive(prev => prev.filter(t => t.id !== id));
+        setTodos(prev => [ { ...todo, completed: false }, ...prev ]);
+      }
+    }
   };
 
-  const deleteTodo = (id: string) => {
-    setTodos(prev => prev.filter(todo => todo.id !== id));
+  // Delete from archive or todos
+  const deleteTodo = (id: string, isArchive = false) => {
+    if (isArchive) {
+      setArchive(prev => prev.filter(todo => todo.id !== id));
+    } else {
+      setTodos(prev => prev.filter(todo => todo.id !== id));
+    }
   };
 
   return (

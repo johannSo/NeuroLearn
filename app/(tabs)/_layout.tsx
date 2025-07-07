@@ -36,7 +36,7 @@ export default function TabLayout() {
         tabBarStyle: [
           {
             position: 'absolute',
-            bottom: 8,
+            bottom: 25,
             borderRadius: 14,
             backgroundColor: Colors.dark.card,
             borderWidth: 1,
@@ -69,16 +69,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="learn"
         options={{
-          title: 'Learn',
-          tabBarIcon: ({ color, focused }) => (
-            <AnimatedTabIcon
-              key={focused ? 'focused' : 'unfocused'}
-              Component={IconSymbol}
-              name="BookOpen"
-              color={color}
-              focused={focused}
-            />
-          ),
+          href: null,
         }}
       />
       <Tabs.Screen
@@ -126,20 +117,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Settings',
-          tabBarIcon: ({ color, focused }) => (
-            <AnimatedTabIcon
-              key={focused ? 'focused' : 'unfocused'}
-              Component={SettingsIcon}
-              color={color}
-              focused={focused}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="todo"
         options={{
           title: 'Todo',
@@ -147,6 +124,20 @@ export default function TabLayout() {
             <AnimatedTabIcon
               key={focused ? 'focused' : 'unfocused'}
               Component={TodoIcon}
+              color={color}
+              focused={focused}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color, focused }) => (
+            <AnimatedTabIcon
+              key={focused ? 'focused' : 'unfocused'}
+              Component={SettingsIcon}
               color={color}
               focused={focused}
             />

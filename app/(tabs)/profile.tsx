@@ -1,7 +1,9 @@
+import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { getArchivedTodos, setArchivedTodos } from './todo';
 
 interface ProfileData {
   name: string;
@@ -9,6 +11,12 @@ interface ProfileData {
   country: string;
   learningHabits: string;
   adhd: 'Yes' | 'Suspected' | 'No';
+}
+
+interface Todo {
+  id: string;
+  text: string;
+  completed: boolean;
 }
 
 export default function ProfileScreen() {
@@ -21,9 +29,11 @@ export default function ProfileScreen() {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [hasData, setHasData] = useState(false);
+  const [archivedTodos, setArchivedTodosState] = useState<Todo[]>([]);
 
   useEffect(() => {
     loadProfileData();
+    loadArchive();
   }, []);
 
   const loadProfileData = async () => {
@@ -37,6 +47,11 @@ export default function ProfileScreen() {
     } catch (error) {
       console.error('Error loading profile data:', error);
     }
+  };
+
+  const loadArchive = async () => {
+    const archive = await getArchivedTodos();
+    setArchivedTodosState(archive);
   };
 
   const saveProfileData = async () => {
@@ -54,6 +69,24 @@ export default function ProfileScreen() {
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleUnarchive = async (todo: Todo) => {
+    // Remove from archive
+    const newArchive = archivedTodos.filter(t => t.id !== todo.id);
+    setArchivedTodosState(newArchive);
+    await setArchivedTodos(newArchive);
+    // Add back to todos
+    const todosRaw = await AsyncStorage.getItem('todos');
+    const todos: Todo[] = todosRaw ? JSON.parse(todosRaw) : [];
+    todos.unshift({ ...todo, completed: false });
+    await AsyncStorage.setItem('todos', JSON.stringify(todos));
+  };
+
+  const handleDeleteArchive = async (id: string) => {
+    const newArchive = archivedTodos.filter(t => t.id !== id);
+    setArchivedTodosState(newArchive);
+    await setArchivedTodos(newArchive);
   };
 
   const renderForm = () => (
@@ -172,6 +205,38 @@ export default function ProfileScreen() {
         >
           <Text style={styles.editButtonText}>Edit Profile</Text>
         </TouchableOpacity>
+
+        <View style={{ marginTop: 32 }}>
+          <Text style={[styles.title, { fontSize: 22, marginBottom: 12 }]}>Archive</Text>
+          {archivedTodos.length === 0 ? (
+            <Text style={{ color: Colors.dark.muted, textAlign: 'center', marginTop: 16 }}>No archived todos.</Text>
+          ) : (
+            archivedTodos.map(item => (
+              <View key={item.id} style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: Colors.dark.card,
+                borderRadius: 14,
+                paddingVertical: 14,
+                paddingHorizontal: 12,
+                marginBottom: 12,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.08,
+                shadowRadius: 6,
+                elevation: 2,
+              }}>
+                <TouchableOpacity onPress={() => handleUnarchive(item)} style={{ marginRight: 14, padding: 4 }}>
+                  <IconSymbol name={'CheckCircle'} color={'#58cc02'} width={28} height={28} />
+                </TouchableOpacity>
+                <Text style={{ flex: 1, color: Colors.dark.muted, fontSize: 18, textDecorationLine: 'line-through' }}>{item.text}</Text>
+                <TouchableOpacity onPress={() => handleDeleteArchive(item.id)} style={{ marginLeft: 10, padding: 4 }}>
+                  <IconSymbol name="Trash2" color="#e74c3c" width={28} height={28} />
+                </TouchableOpacity>
+              </View>
+            ))
+          )}
+        </View>
       </ScrollView>
     </View>
   );
