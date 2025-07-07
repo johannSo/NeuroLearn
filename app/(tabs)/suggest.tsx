@@ -5,12 +5,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Bot, User } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View
+    ActivityIndicator,
+    KeyboardAvoidingView,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { Colors } from '../../constants/Colors';
@@ -46,6 +46,12 @@ const formatSessionForPrompt = (sessions: Session[]): string => {
   return context;
 };
 
+// Helper to format profile data for prompt
+const formatProfileForPrompt = (profile: any): string => {
+  if (!profile) return "No profile data available.";
+  return `User profile:\n- Name: ${profile.name || 'Not specified'}\n- Age: ${profile.age || 'Not specified'}\n- Country: ${profile.country || 'Not specified'}\n- Learning Habits: ${profile.learningHabits || 'Not specified'}\n- ADHD: ${profile.adhd || 'Not specified'}`;
+};
+
 export default function SuggestScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [sessionHistory, setSessionHistory] = useState<Session[]>([]);
@@ -54,6 +60,7 @@ export default function SuggestScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [showApiKeyError, setShowApiKeyError] = useState(false);
+  const [profile, setProfile] = useState<any>(null);
 
   const suggestedQuestions = [
     "How can I improve my focus while studying?",
@@ -85,6 +92,9 @@ export default function SuggestScreen() {
       ]);
       const key = await AsyncStorage.getItem('GEMINI_API_KEY');
       setApiKey(key);
+      // Load profile data
+      const profileRaw = await AsyncStorage.getItem('PROFILE_DATA');
+      setProfile(profileRaw ? JSON.parse(profileRaw) : null);
     };
     fetchHistoryAndKey();
   }, []);
@@ -110,6 +120,7 @@ export default function SuggestScreen() {
     setIsLoading(true);
 
     const sessionContext = formatSessionForPrompt(sessionHistory);
+    const profileContext = formatProfileForPrompt(profile);
 
     try {
       const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent', {
@@ -123,7 +134,7 @@ export default function SuggestScreen() {
             {
               parts: [
                 {
-                  text: `${sessionContext}\n\nYou are an AI learning assistant for the app called \"NeuroLearn\", it is an inteligent Pomodoro Timer with you the AI built into it. The user asks: \"${textToSend}\". Please provide helpful, encouraging, and practical advice based on their history. Keep your response SHORT and CONCISE - aim for 2-3 short paragraphs maximum. Be encouraging but direct.`
+                  text: `${profileContext}\n\n${sessionContext}\n\nYou are an AI learning assistant for the app called \"NeuroLearn\", it is an inteligent Pomodoro Timer with you the AI built into it. The user asks: \"${textToSend}\". Please provide helpful, encouraging, and practical advice based on their history and profile. Keep your response SHORT and CONCISE - aim for 2-3 short paragraphs maximum. Be encouraging but direct.`
                 }
               ]
             }

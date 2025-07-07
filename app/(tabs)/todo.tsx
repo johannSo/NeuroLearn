@@ -100,6 +100,16 @@ export default function TodoScreen() {
     }
   };
 
+  // Save todos to AsyncStorage whenever they change
+  useEffect(() => {
+    AsyncStorage.setItem('todos', JSON.stringify(todos));
+  }, [todos]);
+
+  // Save archive to AsyncStorage whenever it changes
+  useEffect(() => {
+    AsyncStorage.setItem('todos_archive', JSON.stringify(archive));
+  }, [archive]);
+
   return (
     <View style={[styles_ai.gradientBg, { backgroundColor: Colors.dark.background }]}>
       <KeyboardAvoidingView
